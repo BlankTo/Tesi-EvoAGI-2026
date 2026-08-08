@@ -13,14 +13,15 @@
 
 Machines write working code and pass professional exams, yet fail at puzzles most people
 solve without training. The Abstraction and Reasoning Corpus (ARC-AGI) makes that gap
-measurable: each task gives a few coloured grids and asks for the rule between them, drawing
-only on notions of objects, geometry, counting and space that developmental psychology
-considers innate.
+measurable. Each task gives a few coloured grids and asks for the rule between them, drawing
+only on notions that developmental psychology considers innate: objects, geometry, counting,
+and space.
 
-Because every task is new, no training distribution can be fitted. Humans average above
+Because every task is new, no training distribution can be fitted and data contamination
+cannot inflate a score. Humans average above
 seventy percent on the training tasks, while plain language models manage about ten; reasoning
 models reach above ninety, but on subsets of the tasks and at inference costs of dollars per
-puzzle. The symbolic route is to search for a short program explaining the examples, which
+puzzle. The symbolic route is to search for a short program fitting the examples, which
 makes the difficulty one of representation, since over raw pixels the programs needed are
 hopelessly long.
 
@@ -38,7 +39,7 @@ programs that survive dropping any pair. The best single run, in the solver's C
 implementation, fits the demonstration pairs of 211 ARC-AGI-1 training tasks and reproduces
 the withheld pair on 163 of the 391 it attempted, the count rising with the compute given. It
 finishes on one ordinary machine, where the models scoring higher on this benchmark run in
-data centres at dollars per puzzle. Pooling runs of differing engines, budgets and seeds, 217
+data centres at dollars per puzzle. Pooling runs of differing engines, budgets, and seeds, 217
 tasks fall at least once, though no single run reaches that.
 
 Three findings run against expectation. The winning programs are tiny: one rewrite rule at
