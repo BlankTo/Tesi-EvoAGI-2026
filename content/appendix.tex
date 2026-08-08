@@ -601,6 +601,27 @@ Program & Targets \\
 \end{tabular}
 \end{table}
 
+\paragraph{The same language, on real tasks.} The table above lists what the enumerator
+proposes; Figure~\ref{fig:app-gallery} shows six programs that actually won, each beside the
+withheld pair it reproduces. The six were picked to span the language rather than to flatter
+it: one task needs no rewrite rule at all and falls to a single global transform, three fall
+to one rule built on a topological, a physical, and a panel-level operator respectively, one
+needs a two-rule composition, and the last is the longest program in the record at four rules.
+Reading a program against the grids it transforms is the quickest way to see what the operator
+names in Appendix~\ref{app:dsl} actually do. Each program in the figure was re-executed to
+produce the grid shown and checked against the target, so the figure does not rest on the run
+record; none of the six uses a repair global, so none depends on that setting either.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{images/thesis/thesis-fig-gallery.pdf}
+    \caption{Six solved ARC-AGI-1 training tasks with the programs that solve them, one panel
+    each: the withheld test pair, input left and output right, under the task identifier and
+    the winning program. Arguments are abbreviated to their values; Table~\ref{tab:app-selargs}
+    and Table~\ref{tab:app-actargs} give the names and ranges.}
+    \label{fig:app-gallery}
+\end{figure}
+
 \paragraph{A resolved task, in full.} Task \texttt{31aa019c}
 (Section~\ref{sec:exp-worked}) is a useful worked example because it exercises a parser
 toggle, a relational selector, and a geometric action on a readable $10\times10$ grid. The
