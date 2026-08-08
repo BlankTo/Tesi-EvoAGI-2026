@@ -30,3 +30,4 @@ summary.pdf
 .DS_Store
 .vscode/
 .idea/
+*.ist
