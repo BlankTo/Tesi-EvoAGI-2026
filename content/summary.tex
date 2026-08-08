@@ -1,0 +1,125 @@
+% Summary (sommario), ~3 pages. This is a standalone extended synopsis, deliberately
+% longer than content/abstract.tex: the abstract is capped at 3550 characters for the
+% submission portal, which is about 570 words, while this needs roughly 1250. The two
+% therefore cannot be one text. Every figure here must match Chapter 6 and the abstract.
+
+The Abstraction and Reasoning Corpus (ARC-AGI) is a benchmark of few-shot visual reasoning
+puzzles, built to measure how efficiently a system generalizes to problems it has never
+seen. Each task presents a handful of coloured input--output grid pairs and asks for the
+rule that maps one to the other. The puzzles deliberately draw only on the ``core
+knowledge'' priors that developmental psychology attributes to every human: objects,
+elementary geometry, counting, and elementary spatial relations. Because every evaluation
+task is new, the benchmark closes the escape route that had quietly inflated scores on
+earlier benchmarks, namely fitting the distribution of the test set. Average human scores
+exceed seventy percent. Plain language models reach around ten percent on the first
+edition of the benchmark and about one percent on the harder ARC-AGI-2. Reasoning models
+have since been reported above ninety percent, but on subsets of the tasks and at inference
+costs measured in dollars per puzzle inside a data centre, which is an approach available
+to very few organizations.
+
+This thesis develops and evaluates a solver that takes a different route. Rather than train
+one large model, it treats every task as a small program-synthesis problem and searches for
+a solution with evolutionary computation. The symbolic alternative is not new, and the
+closest published relative, ARGA, also lifts grids into a graph of objects and searches for
+a transformation over that structure. Nor is ARGA's representation simply fixed: it defines
+several hand-written rules for what counts as an object and lets a tabu list suspend any
+abstraction whose branches are producing worsening results. What distinguishes the present work is
+the size and the coupling of that choice. Instead of a menu of whole abstractions, the
+representation is a configuration of forty-four parameters over a seventeen-pass pipeline,
+and it is carried in the same genome as the program, so both are varied by the same
+operators under one fitness rather than one being searched while the other is scored.
+
+Three components are optimized together for each task. A \emph{parser} turns a raw grid
+into a typed directed multigraph through a pipeline of seventeen detection passes, each
+gated by one of forty-four evolvable parameters, emitting seven node types and twenty-two
+edge types. A \emph{program}, written in a graph-native domain-specific language of
+thirty-four selectors, forty-four actions, twenty-six global transforms and three guards,
+rewrites that input graph into an output graph. A \emph{projector} renders the result back
+into a grid under four policy axes. Most of the modelling happens in the intermediate
+multigraph, whose node and edge families follow the core-knowledge priors: objects,
+geometry, spatial relations, and a coarse naive physics. Because the language is
+graph-typed, the operators available on a given task are only those whose types the parser
+has populated, so choosing how to see a grid also narrows the space of programs over it.
+
+The three components form a single individual that a genetic-programming loop evolves under
+a per-task wall-clock budget, in three phases: a short seed enumerator covering obvious
+hypotheses, a deadline-driven search with typed per-slot mutation and crossover, and a
+refinement pass that hill-climbs and compresses the best candidates. A correct or incorrect
+signal is far too blunt to steer such a search, so candidates are ranked lexicographically
+on an eight-key tuple. Exact reproduction of every training pair is treated as a
+discontinuity to land on rather than a surface to climb, an object-graph distance grades the
+comparison below that frontier, and, above it, a leave-one-out penalty prefers programs that
+would still fit if any single training pair were withheld. Parent selection is
+epsilon-lexicase, which is worth thirty-two percent on the train-and-test count against a
+tournament baseline. The thesis also studies a library-learning extension that mines
+reusable, role-typed ``macros'' from previously solved programs and reinjects them as a
+sampling prior, in the spirit of DreamCoder's wake--sleep cycle.
+
+On ARC-AGI-1, the best single run reproduces the demonstration pairs of 211 tasks and solves
+163 of the 391 it attempted under the benchmark's two-attempt protocol, without any
+task-specific tuning and with no neural network anywhere in the loop. Two qualifications
+belong with that figure. It comes from the C implementation of the solver rather than the
+Python one described in this thesis, and its task set is the 391 ARC-AGI-1 training tasks that
+also appear in ARC-AGI-2, not the full 400; the best run over all 400 solves 134. What the
+figure does establish is the cost side of the comparison. The whole run fits on one ordinary
+machine, where the language and reasoning models that score higher on this benchmark are run
+in data centres at inference costs measured in dollars per puzzle.
+
+The gap between programs that fit and programs that generalize is the more informative
+quantity. In the reference Python configuration, 34 of 161 fitted programs miss the withheld
+pair, a twenty-one percent overfitting rate, and the approach scales monotonically with the
+compute it is given without saturating over the range tested.
+
+Three findings run against expectation. First, the solutions are remarkably short. The
+median winning program is a single rewrite rule and roughly nine in ten use at most two, and
+the distribution barely moves as the budget grows eightfold, so additional compute buys more
+solutions rather than longer ones. The work a pixel-level language would have to spell out is
+absorbed by the parser and the global-transform slot. Second, the limiting component is not
+perception. The tasks the solver narrowly misses are parsed more consistently than the ones
+it solves, forty-six percent of solved tasks leave the parser at its default configuration,
+and where a hand-labelled reference graph exists the parser can be driven to near-zero graph
+distance. The remaining gap lies in the expressiveness of the rewrite language, and a
+hand-read analysis of four failures names the missing pieces precisely: the one operator
+whose output size is data-derived binds to the wrong quantity, and write semantics cannot be
+specified per rule. Third, repeating the cheapest configuration across five seeds separates
+two ways a run can fail. The count of tasks whose training pairs are fitted is stable at
+$106.2 \pm 1.8$, while the count solved on the withheld pair varies twice as widely, at
+$97.2 \pm 3.6$. The search reliably finds \emph{a} fitting program; which fitting program it
+finds is what varies. Generalization fails here because the fitness cannot discriminate, not
+because the search cannot find.
+
+That noise floor is the thesis's methodological claim, and it was earned the hard way. For a
+long stretch the solver was not deterministic at a fixed seed, because unpinned hash
+randomization reordered the sets and dictionaries on the search's decision path. Pinning it
+did not improve the method; it made the method measurable, and roughly ten earlier
+development phases turn out to have been reverted on evidence that was noise. The surviving
+record shows a consistent asymmetry: changes that add expressiveness without perturbing the
+existing search trajectory clear the signal-above-noise bar, while changes that only reshape
+the fitness surface or re-weight the sampler trade tasks rather than add them.
+
+Two results bound the approach. Pooling the 93 runs of the development log, their union
+reaches 217 of the 400 tasks at two attempts, above half the benchmark. That figure is an
+oracle over runs of differing engines, budgets and seeds rather than a performance claim: no
+configuration achieves it, eleven of the pooled solves were refuted on inspection and
+ninety-nine could not be checked, and the census itself is incomplete. In the
+other direction, on the harder ARC-AGI-2 the same solver fits the demonstration pairs of
+only 3 of 120 held-out tasks and solves 2, with essentially every task consuming its entire
+budget. That result is weak and is reported as such. It is also the outcome the ARC-AGI-1
+diagnostics predict, since a benchmark built to demand multi-step compositional reasoning
+meets a system whose median winning program is one rule. The macro library, measured against
+the same bar, is likewise a null: mined strategies do recur across unrelated tasks, covering
+roughly a third of held-out ones, but the prior built on them gains only two to four tasks
+in distribution, is flat on held-out data, and churns some thirteen tasks per side through
+trajectory disruption. The premise holds; the delivery does not yet pay for itself.
+
+The thesis closes by setting out what would have to change. Making the parser compositional,
+so that it builds new detectors from existing ones rather than only tuning parameters, is the
+first item. A learned discriminator between programs that all fit the examples is the second,
+and the one place a neural component would clearly earn its keep. Beyond the static
+benchmark, ARC-AGI-3 replaces grid pairs with interactive environments, where the mapping
+from one graph to another no longer applies but the core-knowledge modelling stance becomes
+more central rather than less. Finally, the cost matters as much as the score. In 2025 the
+four largest technology companies committed capital expenditure on the order of
+US\$400 billion to data centres and artificial intelligence. If a third of this benchmark
+yields to concepts, symbols and a few hours of ordinary compute, the question of who is able
+to compete on reasoning-related technology changes.

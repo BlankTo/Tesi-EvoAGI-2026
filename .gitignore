@@ -1,0 +1,32 @@
+# LaTeX build artefacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.glo
+*.glo-abr
+*.gls
+*.glg
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+thesis.pdf
+summary.pdf
+
+# glossaries / acronyms outputs
+*.acn
+*.acr
+*.alg
+*.glsdefs
+
+# OS and editor
+.DS_Store
+.vscode/
+.idea/
