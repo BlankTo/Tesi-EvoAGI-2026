@@ -41,26 +41,26 @@ geometry, spatial relations, and a coarse naive physics. Because the language is
 graph-typed, the operators available on a given task are only those whose types the parser
 has populated, so choosing how to see a grid also narrows the space of programs over it.
 
-The three components form a single individual that a genetic-programming loop evolves under
+The three components form a single individual that an evolutionary loop evolves under
 a per-task wall-clock budget, in three phases: a short seed enumerator covering obvious
 hypotheses, a deadline-driven search with typed per-slot mutation and crossover, and a
 refinement pass that hill-climbs and compresses the best candidates. A correct or incorrect
 signal is far too blunt to steer such a search, so candidates are ranked lexicographically
-on an eight-key tuple. Exact reproduction of every training pair is treated as a
+on an eight-key tuple. Exact reproduction of every train pair is treated as a
 discontinuity to land on rather than a surface to climb, an object-graph distance grades the
 comparison below that frontier, and, above it, a leave-one-out penalty prefers programs that
-would still fit if any single training pair were withheld. Parent selection is
+would still fit if any single train pair were withheld. Parent selection is
 epsilon-lexicase, which is worth thirty-two percent on the train-and-test count against a
 tournament baseline. The thesis also studies a library-learning extension that mines
 reusable, role-typed ``macros'' from previously solved programs and reinjects them as a
 sampling prior, in the spirit of DreamCoder's wake--sleep cycle.
 
-On ARC-AGI-1, the best single run reproduces the demonstration pairs of 211 tasks and solves
+On ARC-AGI-1, the best single run reproduces the train pairs of 211 tasks and solves
 163 of the 391 it attempted under the benchmark's two-attempt protocol, without any
 task-specific tuning and with no neural network anywhere in the loop. Two qualifications
 belong with that figure. It comes from the C implementation of the solver rather than the
 Python one described in this thesis, and its task set is the 391 ARC-AGI-1 training tasks that
-also appear in ARC-AGI-2, not the full 400; the best run over all 400 solves 134. What the
+also appear in ARC-AGI-2, not the full 400; the best run over all 400 solves 138 at two attempts. What the
 figure does establish is the cost side of the comparison. The whole run fits on one ordinary
 machine, where the language and reasoning models that score higher on this benchmark are run
 in data centres at inference costs measured in dollars per puzzle.
@@ -70,19 +70,22 @@ quantity. In the reference Python configuration, 34 of 161 fitted programs miss 
 pair, a twenty-one percent overfitting rate, and the approach scales monotonically with the
 compute it is given without saturating over the range tested.
 
-Three findings run against expectation. First, the solutions are remarkably short. The
+Three findings deserve emphasis. The first was expected and is worth stating precisely: the
+solutions are remarkably short. The
 median winning program is a single rewrite rule and roughly nine in ten use at most two, and
 the distribution barely moves as the budget grows eightfold, so additional compute buys more
 solutions rather than longer ones. The work a pixel-level language would have to spell out is
-absorbed by the parser and the global-transform slot. Second, the limiting component is not
+absorbed by the parser and the global-transform slot, which is what co-evolving the
+representation is for. The second cuts against ``expectation'': the limiting component is not
 perception. The tasks the solver narrowly misses are parsed more consistently than the ones
 it solves, forty-six percent of solved tasks leave the parser at its default configuration,
 and where a hand-labelled reference graph exists the parser can be driven to near-zero graph
 distance. The remaining gap lies in the expressiveness of the rewrite language, and a
 hand-read analysis of four failures names the missing pieces precisely: the one operator
 whose output size is data-derived binds to the wrong quantity, and write semantics cannot be
-specified per rule. Third, repeating the cheapest configuration across five seeds separates
-two ways a run can fail. The count of tasks whose training pairs are fitted is stable at
+specified per rule. The third came from repeating the cheapest configuration across five
+seeds, which separates
+two ways a run can fail. The count of tasks whose train pairs are fitted is stable at
 $106.2 \pm 1.8$, while the count solved on the withheld pair varies twice as widely, at
 $97.2 \pm 3.6$. The search reliably finds \emph{a} fitting program; which fitting program it
 finds is what varies. Generalization fails here because the fitness cannot discriminate, not
@@ -102,7 +105,7 @@ reaches 217 of the 400 tasks at two attempts, above half the benchmark. That fig
 oracle over runs of differing engines, budgets, and seeds rather than a performance claim: no
 configuration achieves it, eleven of the pooled solves were refuted on inspection and
 ninety-nine could not be checked, and the census itself is incomplete. In the
-other direction, on the harder ARC-AGI-2 the same solver fits the demonstration pairs of
+other direction, on the harder ARC-AGI-2 the same solver fits the train pairs of
 only 3 of 120 held-out tasks and solves 2, with essentially every task consuming its entire
 budget. That result is weak and is reported as such. It is also the outcome the ARC-AGI-1
 diagnostics predict, since a benchmark built to demand multi-step compositional reasoning
@@ -116,9 +119,9 @@ The thesis closes by setting out what would have to change. Making the parser co
 so that it builds new detectors from existing ones rather than only tuning parameters, is the
 first item. A learned discriminator between programs that all fit the examples is the second,
 and the one place a neural component would clearly earn its keep. Beyond the static
-benchmark, ARC-AGI-3 replaces grid pairs with interactive environments, where the mapping
-from one graph to another no longer applies but the core-knowledge modelling stance becomes
-more central rather than less. Finally, the cost matters as much as the score. In 2025 the
+benchmark, an interactive setting replaces grid pairs with actions and feedback, where the
+mapping from one graph to another no longer applies but the core-knowledge modelling stance
+becomes more central rather than less. Finally, the cost matters as much as the score. In 2025 the
 four largest technology companies committed capital expenditure on the order of
 US\$400 billion to data centres and artificial intelligence. If a third of this benchmark
 yields to concepts, symbols, and a few hours of ordinary compute, the question of who is able
