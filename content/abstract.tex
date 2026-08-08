@@ -19,7 +19,7 @@ and space.
 
 Because every task is new, no training distribution can be fitted and data contamination
 cannot inflate a score. Humans average above
-seventy percent on the training tasks, while plain language models manage about ten; reasoning
+seventy percent, while plain language models manage about ten; reasoning
 models reach above ninety, but on subsets of the tasks and at inference costs of dollars per
 puzzle. The symbolic route is to search for a short program fitting the examples, which
 makes the difficulty one of representation, since over raw pixels the programs needed are
@@ -29,34 +29,36 @@ The question this thesis takes up is whether that representation can itself be a
 parameterized space, searched per task alongside the program and within a budget that fits one
 machine.
 
-This thesis shows that it can. Genetic programming evolves three components together per
+This thesis shows that it can. An evolutionary algorithm co-evolves three components per
 task: a \emph{parser} turning a grid into a typed graph of objects and relations, a short
 \emph{program} of rewrite rules over that graph, and a \emph{projector} rendering the result
-back. The parser is seventeen detection passes under forty-four evolvable parameters, in the same
-genome as the program. Candidates are ranked first on reproducing every demonstration pair
+back. The current parser is seventeen detection passes under forty-four evolvable parameters, in the same
+genome as the program. Candidates are ranked first on reproducing every train pair
 exactly, then by a graph distance over those that fail and a leave-one-out penalty favouring
 programs that survive dropping any pair. The best single run, in the solver's C
-implementation, fits the demonstration pairs of 211 ARC-AGI-1 training tasks and reproduces
+implementation, fits the train pairs of 211 tasks in the ARC-AGI-1 training set and reproduces
 the withheld pair on 163 of the 391 it attempted, the count rising with the compute given. It
 finishes on one ordinary machine, where the models scoring higher on this benchmark run in
 data centres at dollars per puzzle. Pooling runs of differing engines, budgets, and seeds, 217
-tasks fall at least once, though no single run reaches that.
+tasks fall to at least one run at two attempts, though no single run reaches that.
 
-Three findings run against expectation. The winning programs are tiny: one rewrite rule at
-the median, nine in ten using at most two, because the parser absorbs modelling a pixel-level
-language would spell out. The limit is not perception either, since tasks narrowly missed are
-parsed more consistently than those solved; it is the expressiveness of the rewrite language. And the gap between that 217 and any one run is a
+The winning programs are tiny: one rewrite rule at the median, nine in ten using at most two,
+which is the point of co-evolving the representation, since the parser absorbs modelling a
+pixel-level language would spell out. Two findings then cut against ``expectation''. The limit
+is not perception, since tasks narrowly missed are
+parsed more consistently than those solved; it is the expressiveness of the rules. And the gap between that 217 and any one run is a
 failure of choice, not of search: fitting programs are found reliably, but the ranking cannot
 always tell which will generalize.
 
-How far this reaches is bounded by the language, not the machine. On the 120 public evaluation
-tasks of ARC-AGI-2, built to demand compositional reasoning a one-rule program cannot express,
-the solver fits 3 and solves 2, only one of them unique to that edition. Mining reusable strategies from solved programs, which do recur across roughly a third of
-held-out tasks, is one attempt at that gap, and does not yet pay.
+The ceiling is what the rules can express, not the machine. On ARC-AGI-2, built to demand the
+multi-step composition a one-rule program cannot express, the solver fits 3 of the 120 public
+evaluation tasks and solves 2, one of those already in ARC-AGI-1. Mining reusable strategies,
+which do recur across a third of held-out tasks, is one attempt at that gap and does not yet
+pay.
 
 Solving ARC-AGI is not solving artificial general intelligence, and the interest lies less in
 the score than in the route. Each solution is a short program that can be read and
 checked rather than a set of weights, and the run fits on ordinary hardware, so it suits
 settings where a decision must be inspected or compute is scarce.
-Extending the representation to learn world models from video of moving objects is the first
-step off static puzzles.
+Interactive environments are the next step, with the same graph predicted forward instead of
+rewritten once.
